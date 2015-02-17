@@ -32,14 +32,12 @@ class LRUCache:
         if len(self.cache) >= self.capacity:
             cache_key, file_path = self.cache.popitem(last=False)
             os.remove(os.path.join(self.cache_dir, cache_key))
-            print 'evict'
         self.cache[key] = 1
         with open(os.path.join(self.cache_dir, key), 'w') as cachefile:
             cachefile.write(value)
         pickle.dump(self.cache, open(self.index_file, 'w'))
 
     def __contains__(self, key):
-        print self.cache.keys
         return key in self.cache
 
 cache = LRUCache(capacity=10, cache_dir='/tmp/cache')
@@ -62,10 +60,7 @@ def fetch_s3_object(bucket, key):
 
     conn = boto.connect_s3()
     if cache_key in cache:
-        print 'debug cache hit'
         return cache[cache_key]
-    else:
-        print 'debug cache miss'
 
     b = conn.get_bucket(bucket)
     k = b.get_key(key)
