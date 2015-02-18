@@ -9,12 +9,13 @@ example:
     curl localhost:8000/org.mozilla.crash-stats.symbols-private/v1/symupload-1.0-Linux-20120709194529-symbols.txt
 """
 
-import proxy
+from proxy import CachingS3Proxy
 from wsgiref.simple_server import make_server
 
 PORT=8000
 
 if __name__ == '__main__':
-    httpd = make_server('', PORT, proxy.proxy_s3_bucket)
+    p = CachingS3Proxy()
+    httpd = make_server('', PORT, p.proxy_s3_bucket)
     print 'Serving HTTP on port %s...' % PORT
     httpd.serve_forever()
