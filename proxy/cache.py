@@ -31,26 +31,30 @@ class LRUCache(object):
         self.index_file = os.path.join(self.cache_dir, 'index')
         with flock(self.lock_path):
             if os.path.exists(self.index_file):
-                self.cache = pickle.load(open(self.index_file, 'r'))
+                (self.total_size, self.cache) = \
+                        pickle.load(open(self.index_file, 'r'))
 
     def __getitem__(self, key):
         abspath = os.path.join(self.cache_dir, key)
         with flock(self.lock_path):
-            self.cache = pickle.load(open(self.index_file, 'r'))
+            (self.total_size, self.cache) = \
+                    pickle.load(open(self.index_file, 'r'))
             self.cache.pop(key)
             size = os.path.getsize(abspath)
             with open(abspath, 'r') as cachefile:
                 value = cachefile.read()
                 # bump this to the top, since it was accessed most recently
                 self.cache[key] = size
-                pickle.dump(self.cache, open(self.index_file, 'w'))
+                pickle.dump((self.total_size, self.cache),
+                        open(self.index_file, 'w'))
                 return value
 
     def __setitem__(self, key, value):
         abspath = os.path.join(self.cache_dir, key)
         with flock(self.lock_path):
             if os.path.exists(self.index_file):
-                self.cache = pickle.load(open(self.index_file, 'r'))
+                (self.total_size, self.cache) = \
+                        pickle.load(open(self.index_file, 'r'))
             # remove files until we're under the limit, if we hit capacity
             while self.total_size >= self.capacity:
                 self.logger.info('cache hit capacity %s' % self.capacity)
@@ -63,7 +67,8 @@ class LRUCache(object):
             size = os.path.getsize(abspath)
             self.cache[key] = size
             self.total_size += size
-            pickle.dump(self.cache, open(self.index_file, 'w'))
+            pickle.dump((self.total_size, self.cache),
+                    open(self.index_file, 'w'))
 
     def __contains__(self, key):
         return key in self.cache
