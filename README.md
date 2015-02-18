@@ -17,6 +17,15 @@ If you want to listen on a different port, just set the PORT variable:
   PORT=9999 caching-s3-proxy
 ```
 
+Alternatively, you can run under uwsgi:
+```
+  uwsgi -w proxy.wsgi -s /var/run/caching-s3-proxy.sock
+```
+
+You can then point Nginx or Apache at the socket created above:
+http://uwsgi-docs.readthedocs.org/en/latest/Nginx.html
+http://uwsgi-docs.readthedocs.org/en/latest/Apache.html
+
 NOTE - the cache code is not threadsafe, this is intended to be run
 single threaded. You probably do want this to block anyway, to prevent a
 thundering-herd problem if there are multiple clients hitting it when
