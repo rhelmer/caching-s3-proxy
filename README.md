@@ -16,3 +16,8 @@ If you want to listen on a different port, just set the PORT variable:
 ```
   PORT=9999 caching-s3-proxy
 ```
+
+NOTE - the cache code is not threadsafe, this is intended to be run
+single threaded. You probably do want this to block anyway, to prevent a
+thundering-herd problem if there are multiple clients hitting it when
+the cache is cold.
