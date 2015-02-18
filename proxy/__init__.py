@@ -15,6 +15,12 @@ class CachingS3Proxy(object):
     def proxy_s3_bucket(self, environ, start_response):
         """proxy private s3 buckets"""
         path_info = environ.get('PATH_INFO', '')
+        if path_info == '/':
+            status = '200 OK'
+            response_headers = [('Content-type', 'text/plain')]
+            start_response(status, response_headers)
+            return ['Caching S3 Proxy']
+
         path_info = path_info.lstrip('/')
         (bucket, key) = path_info.split('/', 1)
         s3_result = self.fetch_s3_object(bucket, key)
