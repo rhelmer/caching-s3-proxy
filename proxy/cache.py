@@ -51,7 +51,6 @@ class LRUCache(object):
         with flock(self.lock_path):
             with open(abspath, 'w') as cachefile:
                 cachefile.write(value)
-        with flock(self.lock_path):
             size = os.path.getsize(abspath)
             self.cache[key] = size
             self.total_size += size
