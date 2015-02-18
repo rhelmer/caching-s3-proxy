@@ -77,7 +77,7 @@ class LRUCache(object):
 # based on https://github.com/erikrose/shiva
 # and also https://github.com/dmfrey/FileLock
 @contextmanager
-def flock(lock_path, timeout=10):
+def flock(lock_path, timeout=300):
     """Context manager that acquires and releases a file-based lock.
     """
     start_time = time.time()
