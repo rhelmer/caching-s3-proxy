@@ -8,6 +8,8 @@ Least Recently Used objects are evicted from the cache first.
 Example:
 ```
   python setup.py install
+  export AWS_ACCESS_KEY_ID=...
+  export AWS_SECRET_ACCESS_KEY=...
   caching-s3-proxy &
   curl localhost:8000/org.mozilla.crash-stats.symbols-private/v1/symupload-1.0-Linux-20120709194529-symbols.txt
 ```
