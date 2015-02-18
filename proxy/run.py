@@ -14,8 +14,11 @@ from wsgiref.simple_server import make_server
 
 PORT=8000
 
-if __name__ == '__main__':
+def main():
     p = CachingS3Proxy()
     httpd = make_server('', PORT, p.proxy_s3_bucket)
     print 'Serving HTTP on port %s...' % PORT
     httpd.serve_forever()
+
+if __name__ == '__main__':
+    main()
