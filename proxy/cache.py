@@ -13,6 +13,8 @@ class LRUCache(object):
         self.capacity = capacity
         self.cache = collections.OrderedDict()
         self.cache_dir = cache_dir
+        if not os.path.exists(self.cache_dir):
+            os.mkdir(self.cache_dir)
         self.index_file = os.path.join(self.cache_dir, 'index')
         if os.path.exists(self.index_file):
             self.cache = pickle.load(open(self.index_file, 'r'))
