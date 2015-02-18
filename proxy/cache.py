@@ -1,5 +1,5 @@
 """
-Filesystem-backed LRU cache. Not threadsafe.
+Filesystem-backed LRU cache.
 """
 
 import collections
