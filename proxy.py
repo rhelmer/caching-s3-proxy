@@ -19,7 +19,7 @@ from wsgiref.simple_server import make_server
 
 PORT=8000
 
-class LRUCache:
+class LRUCache(object):
     def __init__(self, capacity, cache_dir):
         self.capacity = capacity
         self.cache = collections.OrderedDict()
