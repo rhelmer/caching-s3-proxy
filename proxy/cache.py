@@ -10,12 +10,13 @@ import tempfile
 
 
 class LRUCache(object):
-    def __init__(self, capacity=1000, cache_dir=tempfile.gettempdir()):
+    def __init__(self, capacity=100, cache_dir=tempfile.gettempdir()):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.capacity = capacity
         self.cache = collections.OrderedDict()
         self.cache_dir = cache_dir
+        self.total_size = 0
         if not os.path.exists(self.cache_dir):
             os.mkdir(self.cache_dir)
         self.logger.info('using cache dir %s' % self.cache_dir)
@@ -25,19 +26,28 @@ class LRUCache(object):
 
     def __getitem__(self, key):
         self.cache.pop(key)
-        self.cache[key] = 1
-        with open(os.path.join(self.cache_dir, key), 'r') as cachefile:
-            return cachefile.read()
+        abspath = os.path.join(self.cache_dir, key)
+        size = os.path.getsize(abspath)
+        with open(abspath, 'r') as cachefile:
+            value = cachefile.read()
+            # bump this to the top, since it was accessed most recently
+            self.cache[key] = size
+            return value
 
     def __setitem__(self, key, value):
-        if len(self.cache) >= self.capacity:
-            self.logger.debug('cache hit capacity %s' % self.capacity)
-            cache_key, file_path = self.cache.popitem(last=False)
+        # remove files until we're under the limit, if we hit capacity
+        while self.total_size >= self.capacity:
+            self.logger.info('cache hit capacity %s' % self.capacity)
+            cache_key, size = self.cache.popitem(last=False)
             os.remove(os.path.join(self.cache_dir, cache_key))
-            logger.debug('evicted %s from cache' % cache_key)
-        self.cache[key] = 1
-        with open(os.path.join(self.cache_dir, key), 'w') as cachefile:
+            self.logger.info('evicted %s from cache' % cache_key)
+            self.total_size -= size
+        abspath = os.path.join(self.cache_dir, key)
+        with open(abspath, 'w') as cachefile:
             cachefile.write(value)
+        size = os.path.getsize(abspath)
+        self.cache[key] = size
+        self.total_size += size
         pickle.dump(self.cache, open(self.index_file, 'w'))
 
     def __contains__(self, key):

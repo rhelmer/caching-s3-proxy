@@ -19,9 +19,13 @@ def test_cache_defaults():
     ok_('blah' not in cache)
 
 def test_cache_eviction():
-    cache = LRUCache(cache_dir='tmp', capacity=3)
+    cache = LRUCache(cache_dir='tmp', capacity=1)
     cache['test1'] = 'blah'
+    ok_('test1' in cache)
     cache['test2'] = 'blah'
+    ok_('test1' in cache)
+    ok_('test2' in cache)
     cache['test3'] = 'blah'
-    cache['test4'] = 'blah'
     ok_('test1' not in cache)
+    ok_('test2' in cache)
+    ok_('test3' in cache)
