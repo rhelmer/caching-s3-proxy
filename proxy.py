@@ -12,15 +12,17 @@ example:
 import boto
 from boto.s3.key import Key
 import collections
+import cPickle as pickle
 import hashlib
 import os
-import cPickle as pickle
+import tempfile
 from wsgiref.simple_server import make_server
 
 PORT=8000
 
+
 class LRUCache(object):
-    def __init__(self, capacity, cache_dir):
+    def __init__(self, capacity=1000, cache_dir=tempfile.gettempdir()):
         self.capacity = capacity
         self.cache = collections.OrderedDict()
         self.cache_dir = cache_dir
@@ -29,13 +31,10 @@ class LRUCache(object):
             self.cache = pickle.load(open(self.index_file, 'r'))
 
     def __getitem__(self, key):
-        try:
-            self.cache.pop(key)
-            self.cache[key] = 1
-            with open(os.path.join(self.cache_dir, key), 'r') as cachefile:
-                return cachefile.read()
-        except KeyError:
-            return -1
+        self.cache.pop(key)
+        self.cache[key] = 1
+        with open(os.path.join(self.cache_dir, key), 'r') as cachefile:
+            return cachefile.read()
 
     def __setitem__(self, key, value):
         if len(self.cache) >= self.capacity:
@@ -49,7 +48,7 @@ class LRUCache(object):
     def __contains__(self, key):
         return key in self.cache
 
-cache = LRUCache(capacity=10, cache_dir='/tmp/cache')
+cache = LRUCache()
 
 def proxy_s3_bucket(environ, start_response):
     """proxy private s3 buckets"""
