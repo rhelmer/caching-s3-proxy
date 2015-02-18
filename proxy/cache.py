@@ -70,7 +70,7 @@ def flock(lock_path, timeout=10):
     start_time = time.time()
     while True:
         try:
-            fd = os.open(lock_path, os.O_CREAT|os.O_EXCL,os.O_RDWR)
+            fd = os.open(lock_path, os.O_CREAT|os.O_EXCL)
             break
         except OSError:
             if (time.time() - start_time) >= timeout:
