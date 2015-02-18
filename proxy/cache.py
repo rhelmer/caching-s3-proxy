@@ -10,7 +10,7 @@ import tempfile
 
 
 class LRUCache(object):
-    def __init__(self, capacity=100, cache_dir=tempfile.gettempdir()):
+    def __init__(self, capacity=(10*10**9), cache_dir=tempfile.gettempdir()):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.capacity = capacity
