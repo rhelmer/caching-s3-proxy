@@ -5,7 +5,7 @@ from setuptools import setup
 
 
 setup(
-    name='CachingS3Proxy',
+    name='caching-s3-proxy',
     version='0.1',
     description=('provides an unauthenticated plain HTTP frontend for'
                  ' public and private S3 buckets, and caches on the'
