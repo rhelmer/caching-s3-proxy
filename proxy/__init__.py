@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Caching S3 Proxy - provides an unauthenticated plain HTTP frontend 
     for public and private S3 buckets, and caches on the filesystem.
@@ -16,9 +15,6 @@ import cPickle as pickle
 import hashlib
 import os
 import tempfile
-from wsgiref.simple_server import make_server
-
-PORT=8000
 
 
 class LRUCache(object):
@@ -75,8 +71,3 @@ def fetch_s3_object(bucket, key):
     obj = k.get_contents_as_string()
     cache[cache_key] = obj
     return obj
-
-if __name__ == '__main__':
-    httpd = make_server('', PORT, proxy_s3_bucket)
-    print 'Serving HTTP on port %s...' % PORT
-    httpd.serve_forever()
