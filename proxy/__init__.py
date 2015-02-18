@@ -17,10 +17,16 @@ class CachingS3Proxy(object):
         path_info = path_info.lstrip('/')
         (bucket, key) = path_info.split('/', 1)
         s3_result = self.fetch_s3_object(bucket, key)
-        status = '200 OK'
-        response_headers = [('Content-type', 'text/plain')]
-        start_response(status, response_headers)
-        return [s3_result]
+        if s3_result:
+            status = '200 OK'
+            response_headers = [('Content-type', 'text/plain')]
+            start_response(status, response_headers)
+            return [s3_result]
+        else:
+            status = '404 NOT FOUND'
+            response_headers = [('Content-type', 'text/plain')]
+            start_response(status, response_headers)
+            return []
 
     def fetch_s3_object(self, bucket, key):
         m = hashlib.md5()
@@ -36,6 +42,9 @@ class CachingS3Proxy(object):
 
         b = conn.get_bucket(bucket)
         k = b.get_key(key)
-        obj = k.get_contents_as_string()
-        self.cache[cache_key] = obj
-        return obj
+        if k:
+            obj = k.get_contents_as_string()
+            self.cache[cache_key] = obj
+            return obj
+        else:
+            return None
