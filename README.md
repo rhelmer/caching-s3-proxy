@@ -17,6 +17,8 @@ If you want to listen on a different port, just set the PORT variable:
   PORT=9999 caching-s3-proxy
 ```
 
+You can also set CAPACITY (in bytes) and CACHEDIR.
+
 Alternatively, you can run under uwsgi:
 ```
   uwsgi -w proxy.wsgi -s /var/run/caching-s3-proxy.sock

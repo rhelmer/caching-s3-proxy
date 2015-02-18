@@ -3,13 +3,14 @@ from boto.s3.key import Key
 import hashlib
 import logging
 from proxy.cache import LRUCache
+import tempfile
 
 
 class CachingS3Proxy(object):
-    def __init__(self):
+    def __init__(self, capacity=(10*10**9), cache_dir=tempfile.gettempdir()):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
-        self.cache = LRUCache()
+        self.cache = LRUCache(capacity, cache_dir)
 
     def proxy_s3_bucket(self, environ, start_response):
         """proxy private s3 buckets"""
