@@ -1,11 +1,14 @@
 import boto
 from boto.s3.key import Key
 import hashlib
+import logging
 from proxy.cache import LRUCache
 
 
 class CachingS3Proxy(object):
     def __init__(self):
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
         self.cache = LRUCache()
 
     def proxy_s3_bucket(self, environ, start_response):
@@ -26,7 +29,10 @@ class CachingS3Proxy(object):
 
         conn = boto.connect_s3()
         if cache_key in self.cache:
+            self.logger.debug('cache hit for %s' % cache_key)
             return self.cache[cache_key]
+        else:
+            self.logger.debug('cache miss for %s' % cache_key)
 
         b = conn.get_bucket(bucket)
         k = b.get_key(key)
