@@ -34,14 +34,16 @@ class LRUCache(object):
                 self.cache = pickle.load(open(self.index_file, 'r'))
 
     def __getitem__(self, key):
-        self.cache.pop(key)
         abspath = os.path.join(self.cache_dir, key)
         with flock(self.lock_path):
+            self.cache = pickle.load(open(self.index_file, 'r'))
+            self.cache.pop(key)
             size = os.path.getsize(abspath)
             with open(abspath, 'r') as cachefile:
                 value = cachefile.read()
                 # bump this to the top, since it was accessed most recently
                 self.cache[key] = size
+                pickle.dump(self.cache, open(self.index_file, 'w'))
                 return value
 
     def __setitem__(self, key, value):
