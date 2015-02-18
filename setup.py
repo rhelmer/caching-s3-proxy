@@ -25,7 +25,7 @@ setup(
     install_requires=['boto>=2.36.0', 'wsgiref>=0.1.2'],
     entry_points={
         'console_scripts': [
-            'cachings3proxy = proxy.run:main'
+            'caching-s3-proxy = proxy.run:main'
             ],
         },
     test_suite='nose.collector',
