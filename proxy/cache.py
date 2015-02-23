@@ -27,6 +27,8 @@ class LRUCache(object):
         if not os.path.exists(self.cache_dir):
             os.mkdir(self.cache_dir)
         self.lock_path = os.path.join(self.cache_dir, 'lock')
+        if os.path.exists(self.lock_path):
+            os.unlink(self.lock_path)
         self.logger.info('using cache dir %s' % self.cache_dir)
         self.index_file = os.path.join(self.cache_dir, 'index')
         with flock(self.lock_path):
