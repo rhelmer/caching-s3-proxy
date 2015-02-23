@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='caching-s3-proxy',
-    version='0.1',
+    version='0.2',
     description=('provides an unauthenticated plain HTTP frontend for'
                  ' public and private S3 buckets, and caches on the'
                  ' filesystem using an LRU cache'),
