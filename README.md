@@ -21,11 +21,18 @@ If you want to listen on a different port, just set the PORT variable:
 
 You can also set CAPACITY (in bytes) and CACHEDIR.
 
-Alternatively, you can run under uwsgi:
+Alternatively, you can run under uwsgi. It's safe to use multiple workers
+processes (the shared file cache uses file locking to allow concurrency):
 ```
-  uwsgi -w proxy.wsgi -s /var/run/caching-s3-proxy.sock
+  uwsgi -w proxy.wsgi --http=localhost:8000 --workers=10
 ```
 
-You can then point Nginx or Apache at the socket created above:
-http://uwsgi-docs.readthedocs.org/en/latest/Nginx.html
+If you want to put this behign Nginx or Apache, use a socket instead:
+```
+  uwsgi -w proxy.wsgi -s /var/run/caching-s3-proxy.sock --workers=10
+```
+
+Then see http://uwsgi-docs.readthedocs.org/en/latest/Nginx.html or
 http://uwsgi-docs.readthedocs.org/en/latest/Apache.html
+
+
