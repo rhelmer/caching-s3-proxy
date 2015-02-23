@@ -27,12 +27,10 @@ processes (the shared file cache uses file locking to allow concurrency):
   uwsgi -w proxy.wsgi --http=localhost:8000 --workers=10
 ```
 
-If you want to put this behign Nginx or Apache, use a socket instead:
+If you want to put this behind Nginx or Apache, use a socket instead:
 ```
   uwsgi -w proxy.wsgi -s /var/run/caching-s3-proxy.sock --workers=10
 ```
 
 Then see http://uwsgi-docs.readthedocs.org/en/latest/Nginx.html or
 http://uwsgi-docs.readthedocs.org/en/latest/Apache.html
-
-
