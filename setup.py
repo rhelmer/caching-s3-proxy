@@ -17,10 +17,11 @@ setup(
     classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: MPL License',
+        'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
         'Programming Language :: Python :: 2.7',
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
         ],
+    packages=['proxy'],
     keywords=['caching', 'lru', 's3', 'proxy', 'unauthenticated'],
     install_requires=['boto>=2.36.0', 'wsgiref>=0.1.2'],
     entry_points={
