@@ -34,3 +34,9 @@ If you want to put this behind Nginx or Apache, use a socket instead:
 
 Then see http://uwsgi-docs.readthedocs.org/en/latest/Nginx.html or
 http://uwsgi-docs.readthedocs.org/en/latest/Apache.html
+
+You can generate an RPM (RHEL/CentOS 7+):
+```
+  gem install fpm
+  fpm -s python -t rpm .
+```
