@@ -2,7 +2,7 @@
 Filesystem-backed LRU cache.
 """
 
-import collections
+import ordereddict
 from contextlib import contextmanager
 import cPickle as pickle
 import logging
@@ -21,7 +21,7 @@ class LRUCache(object):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.capacity = capacity
-        self.cache = collections.OrderedDict()
+        self.cache = ordereddict.OrderedDict()
         self.cache_dir = cache_dir
         self.total_size = 0
         if not os.path.exists(self.cache_dir):
