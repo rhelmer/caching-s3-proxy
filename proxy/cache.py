@@ -33,6 +33,9 @@ class LRUCache(object):
             if os.path.exists(self.index_file):
                 (self.total_size, self.cache) = \
                         pickle.load(open(self.index_file, 'r'))
+            else:
+                pickle.dump((self.total_size, self.cache),
+                            open(self.index_file, 'w'))
 
     def __getitem__(self, key):
         abspath = os.path.join(self.cache_dir, key)
