@@ -2,9 +2,9 @@
 Filesystem-backed LRU cache.
 """
 
-import ordereddict
+from collections import OrderedDict
 from contextlib import contextmanager
-import cPickle as pickle
+import pickle as pickle
 import logging
 import os
 import tempfile
@@ -21,7 +21,7 @@ class LRUCache(object):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.capacity = capacity
-        self.cache = ordereddict.OrderedDict()
+        self.cache = OrderedDict()
         self.cache_dir = cache_dir
         self.total_size = 0
         if not os.path.exists(self.cache_dir):
@@ -32,24 +32,24 @@ class LRUCache(object):
         with flock(self.lock_path):
             if os.path.exists(self.index_file):
                 (self.total_size, self.cache) = \
-                        pickle.load(open(self.index_file, 'r'))
+                        pickle.load(open(self.index_file, 'rb'))
             else:
                 pickle.dump((self.total_size, self.cache),
-                            open(self.index_file, 'w'))
+                            open(self.index_file, 'wb'))
 
     def __getitem__(self, key):
         abspath = os.path.join(self.cache_dir, key)
         with flock(self.lock_path):
             (self.total_size, self.cache) = \
-                    pickle.load(open(self.index_file, 'r'))
+                    pickle.load(open(self.index_file, 'rb'))
             self.cache.pop(key)
             size = os.path.getsize(abspath)
-            with open(abspath, 'r') as cachefile:
+            with open(abspath, 'rb') as cachefile:
                 value = cachefile.read()
                 # bump this to the top, since it was accessed most recently
                 self.cache[key] = size
                 pickle.dump((self.total_size, self.cache),
-                        open(self.index_file, 'w'))
+                            open(self.index_file, 'wb'))
                 return value
 
     def __setitem__(self, key, value):
@@ -57,7 +57,7 @@ class LRUCache(object):
         with flock(self.lock_path):
             if os.path.exists(self.index_file):
                 (self.total_size, self.cache) = \
-                        pickle.load(open(self.index_file, 'r'))
+                        pickle.load(open(self.index_file, 'rb'))
             # remove files until we're under the limit, if we hit capacity
             while self.total_size >= self.capacity:
                 self.logger.info('cache hit capacity %s' % self.capacity)
@@ -65,13 +65,13 @@ class LRUCache(object):
                 os.remove(os.path.join(self.cache_dir, cache_key))
                 self.logger.info('evicted %s from cache' % cache_key)
                 self.total_size -= size
-            with open(abspath, 'w') as cachefile:
+            with open(abspath, 'wb') as cachefile:
                 cachefile.write(value)
             size = os.path.getsize(abspath)
             self.cache[key] = size
             self.total_size += size
             pickle.dump((self.total_size, self.cache),
-                    open(self.index_file, 'w'))
+                        open(self.index_file, 'wb'))
 
     def __contains__(self, key):
         return key in self.cache

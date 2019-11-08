@@ -1,3 +1,4 @@
+from __future__ import print_function
 import boto3
 import botocore
 import hashlib
@@ -38,7 +39,7 @@ class CachingS3Proxy(object):
 
     def fetch_s3_object(self, bucket, key):
         m = hashlib.md5()
-        m.update(bucket+key)
+        m.update((bucket+key).encode('utf-8'))
         cache_key = m.hexdigest()
 
         try:
