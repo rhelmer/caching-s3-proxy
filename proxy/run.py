@@ -11,7 +11,7 @@ def main():
     p = CachingS3Proxy(capacity, cache_dir)
     port = int(os.environ.get('PORT', 8000))
     httpd = make_server('', port, p.proxy_s3_bucket)
-    print 'Serving HTTP on port %s...' % port
+    print('Serving HTTP on port %s...' % port)
     httpd.serve_forever()
 
 if __name__ == '__main__':
