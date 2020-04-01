@@ -34,12 +34,10 @@ Cached object files are stored by default wherever your OS leaves temporary file
   CACHEDIR=/mnt/tmp caching-s3-proxy
 ```
 
-You can also set `CAPACITY` (in bytes, default is 1GB) and `CACHEDIR` :
-
 uWSGI
 =====
 
-Alternatively, you can run under uwsgi. It's safe to use multiple workers
+Alternatively, you can run under uwsgi. It's safe to use multiple worker
 processes (the shared file cache uses file locking to allow concurrency):
 ```
   uwsgi -w proxy.wsgi --http=localhost:8000 --workers=10
