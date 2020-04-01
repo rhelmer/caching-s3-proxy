@@ -1,12 +1,12 @@
 Caching S3 Proxy
-----
-
-Standalone
-==========
+================
 
 Provides an unauthenticated plain HTTP frontend
 for public and private S3 buckets, and caches on the filesystem.
 Least Recently Used objects are evicted from the cache first.
+
+Running Standalone
+------------------
 
 Example:
 ```
@@ -35,7 +35,7 @@ Cached object files are stored by default wherever your OS leaves temporary file
 ```
 
 uWSGI
-=====
+-----
 
 Alternatively, you can run under uwsgi. It's safe to use multiple worker
 processes (the shared file cache uses file locking to allow concurrency):
