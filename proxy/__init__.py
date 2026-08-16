@@ -39,7 +39,16 @@ class CachingS3Proxy(object):
 
     def fetch_s3_object(self, bucket, key):
         m = hashlib.md5()
-        m.update((bucket+key).encode('utf-8'))
+
+        s3_object = self.s3.Object(bucket, key)
+        try:
+            # HEAD to obtain LastModified for the cache key without downloading
+            s3_object.load()
+        except botocore.exceptions.ClientError:
+            self.logger.warn('key not found: s3://%s/%s' % (bucket, key))
+            raise
+
+        m.update((bucket + key + str(s3_object.last_modified)).encode('utf-8'))
         cache_key = m.hexdigest()
 
         try:
@@ -47,7 +56,7 @@ class CachingS3Proxy(object):
         except KeyError:
             self.logger.debug('cache miss for %s' % cache_key)
 
-            obj = self.s3.Object(bucket, key).get()
+            obj = s3_object.get()
             body = obj['Body'].read()
             self.cache[cache_key] = body
             return body
