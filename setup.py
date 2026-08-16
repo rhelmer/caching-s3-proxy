@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='caching-s3-proxy',
-    version='0.6',
+    version='0.7',
     description=('provides an unauthenticated plain HTTP frontend for'
                  ' public and private S3 buckets, and caches on the'
                  ' filesystem using an LRU cache'),
@@ -19,11 +19,12 @@ setup(
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
         ],
     packages=['proxy'],
     keywords=['caching', 'lru', 's3', 'proxy', 'unauthenticated'],
-    install_requires=['boto>=2.36.0', 'wsgiref>=0.1.2', 'ordereddict>=1.1'],
+    install_requires=['boto3>=1.6.22'],
     entry_points={
         'console_scripts': [
             'caching-s3-proxy = proxy.run:main'

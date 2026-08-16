@@ -1,5 +1,6 @@
-import boto
-from boto.s3.key import Key
+from __future__ import print_function
+import boto3
+import botocore
 import hashlib
 import logging
 from proxy.cache import LRUCache
@@ -11,6 +12,7 @@ class CachingS3Proxy(object):
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
         self.cache = LRUCache(capacity, cache_dir)
+        self.s3 = boto3.resource('s3')
 
     def proxy_s3_bucket(self, environ, start_response):
         """proxy private s3 buckets"""
@@ -23,34 +25,38 @@ class CachingS3Proxy(object):
 
         path_info = path_info.lstrip('/')
         (bucket, key) = path_info.split('/', 1)
-        s3_result = self.fetch_s3_object(bucket, key)
-        if s3_result:
+        try:
+            s3_result = self.fetch_s3_object(bucket, key)
             status = '200 OK'
             response_headers = [('Content-type', 'text/plain')]
-            start_response(status, response_headers)
-            return [s3_result]
-        else:
+        except botocore.exceptions.ClientError as ce:
+            s3_result = ce.response['Error']['Message']
             status = '404 NOT FOUND'
             response_headers = [('Content-type', 'text/plain')]
-            start_response(status, response_headers)
-            return []
+
+        start_response(status, response_headers)
+        return [s3_result]
 
     def fetch_s3_object(self, bucket, key):
         m = hashlib.md5()
 
-        conn = boto.connect_s3()
+        s3_object = self.s3.Object(bucket, key)
+        try:
+            # HEAD to obtain LastModified for the cache key without downloading
+            s3_object.load()
+        except botocore.exceptions.ClientError:
+            self.logger.warn('key not found: s3://%s/%s' % (bucket, key))
+            raise
 
-        b = conn.get_bucket(bucket)
-        k = b.get_key(key)
-        if k == None:
-            return None
-        m.update(bucket+key+k.last_modified)
-        cache_key=m.hexdigest()
-        if cache_key in self.cache:
-            self.logger.debug('cache hit for %s' % cache_key)
+        m.update((bucket + key + str(s3_object.last_modified)).encode('utf-8'))
+        cache_key = m.hexdigest()
+
+        try:
             return self.cache[cache_key]
-        else:
+        except KeyError:
             self.logger.debug('cache miss for %s' % cache_key)
-        obj = k.get_contents_as_string()
-        self.cache[cache_key] = obj
-        return obj
+
+            obj = s3_object.get()
+            body = obj['Body'].read()
+            self.cache[cache_key] = body
+            return body
